@@ -79,10 +79,7 @@ app.post("/enviar-mail", async (req, res) => {
 
 
 
-const enviarMail =  (asunto, mensaje, correos) => {
-
-    
-  console.log(data);
+const enviarMail = (asunto, mensaje, correos, data) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -91,14 +88,16 @@ const enviarMail =  (asunto, mensaje, correos) => {
     },
   });
 
-
   correos.forEach((correo) => {
     const mailOptions = {
       from: "davidtorresim@gmail.com",
       to: correo,
       subject: asunto,
       html: `<div class="">${mensaje} <br> <br>
-      <p>El valor de la UF es: ${data}</p></div>`,
+      <p>El valor del dolar es: ${data.dolar.valor}</p><br>
+      <p>El valor del euro es: ${data.euro.valor}</p><br>
+      <p>El valor del uf de hoy es: ${data.uf.valor}</p><br>
+      <p>El valor de la UTM es: ${data.utm.valor}</p></div>`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
