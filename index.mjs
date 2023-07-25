@@ -28,16 +28,21 @@ app.get("/", (req, res) => {
 
 });
 
-app.post("/enviar-mail", (req, res)=>{
-    const asunto = req.body.asunto;
-    const mensaje = req.body.mensaje;
-    const destinatarios = req.body.correos;
-    let correos = destinatarios.split(",");
-   consultarApi();
-      
-    
-    //enviarMail(asunto, mensaje, correos);
+app.post("/enviar-mail", async (req, res) => {
+  const asunto = req.body.asunto;
+  const mensaje = req.body.mensaje;
+  const destinatarios = req.body.correos;
+  let correos = destinatarios.split(",");
 
+  try {
+    const data = await consultarApi();
+    console.log(data);
+    enviarMail(asunto, mensaje, correos, data);
+    res.send("Correo enviado correctamente.");
+  } catch (error) {
+    console.error("Error al consultar la API o enviar el correo:", error);
+    res.status(500).send("Error al enviar el correo.");
+  }
 });
 
  app.listen(3000, () => {
@@ -47,25 +52,28 @@ app.post("/enviar-mail", (req, res)=>{
 
 
 
-  function consultarApi() {
-  https
-    .get("https://mindicador.cl/api",  function (res) {
+ function consultarApi() {
+  return new Promise((resolve, reject) => {
+    https.get("https://mindicador.cl/api", function (res) {
       res.setEncoding("utf-8");
-      //console.log(res);
-      var data = "";
+      let data = "";
 
       res.on("data", function (chunk) {
         data += chunk;
       });
-      res.on("end",  function () {
-        var dailyIndicators = JSON.parse(data);
-        console.log(dailyIndicators);
-        return dailyIndicators;
+
+      res.on("end", function () {
+        try {
+          const dailyIndicators = JSON.parse(data);
+          resolve(dailyIndicators);
+        } catch (error) {
+          reject("Error al parsear la respuesta de la API.");
+        }
       });
-    })
-    .on("error", function (err) {
-      console.log("Error al consumir la API!");
+    }).on("error", function (err) {
+      reject("Error al consumir la API.");
     });
+  });
 }
 
 
