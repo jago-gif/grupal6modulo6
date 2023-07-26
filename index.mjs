@@ -3,6 +3,9 @@ import hbs from "hbs";
 import nodemailer from "nodemailer";
 import bodyParser from "body-parser";
 import https from "https";
+import { v4 as uuidv4 } from "uuid";
+import fs from "fs";
+
  
 
 
@@ -38,6 +41,7 @@ app.post("/enviar-mail", async (req, res) => {
     const data = await consultarApi();
     console.log(data);
     enviarMail(asunto, mensaje, correos, data);
+    guardarCorreo(asunto, mensaje, correos, data);
     res.send("Correo enviado correctamente.");
   } catch (error) {
     console.error("Error al consultar la API o enviar el correo:", error);
@@ -83,14 +87,14 @@ const enviarMail = (asunto, mensaje, correos, data) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "davidtorresim@gmail.com",
-      pass: "nmacuzmcmgntcypr",
+      user: "testigotestigo7@gmail.com",
+      pass: "cadfssqhovxtjaju",
     },
   });
 
   correos.forEach((correo) => {
     const mailOptions = {
-      from: "davidtorresim@gmail.com",
+      from: "testigotestigo7@gmail.com",
       to: correo,
       subject: asunto,
       html: `<div class="">${mensaje} <br> <br>
@@ -109,4 +113,25 @@ const enviarMail = (asunto, mensaje, correos, data) => {
     });
   });
 };
+function guardarCorreo(asunto, mensaje, correos, data) {
+
+    correos.forEach((correo) => {
+      const id = uuidv4();
+      let contenido = `asunto: ${asunto}
+      mensaje: ${mensaje}
+      correos: ${correo}
+      valores:
+      dolar${data.dolar.valor} 
+      euro${data.euro.valor} 
+      uf${data.uf.valor} 
+      utm${data.utm.valor} `;
+      fs.writeFile(`./correos/${id}.txt`, contenido, (err) => {
+        if (err) {
+          console.error(err);
+        }
+      })
+    });
+  }
+    
+
 

@@ -1,0 +1,8 @@
+asunto: asunto de prueba
+      mensaje: mensaje prueba
+      correos: halcon1411@gmail.com
+      valores:
+      dolar827.1 
+      euro915.74 
+      uf36063.02 
+      utm63326 
